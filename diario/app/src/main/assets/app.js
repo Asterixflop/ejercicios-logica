@@ -296,6 +296,139 @@
   libro.addEventListener('pointerup', terminarArrastre);
   libro.addEventListener('pointercancel', terminarArrastre);
 
+  // ---------- Ajustes de lectura ----------
+  var LETRAS = [
+    { id: 'literata', nombre: 'Literata', css: '"Literata", Georgia, serif', escala: 1 },
+    { id: 'clasica', nombre: 'Clásica', css: 'Georgia, "Noto Serif", "Times New Roman", serif', escala: 1 },
+    { id: 'moderna', nombre: 'Moderna', css: 'Roboto, "Helvetica Neue", Arial, sans-serif', escala: 0.95 },
+    { id: 'manuscrita', nombre: 'Manuscrita', css: '"Caveat", "Segoe Print", cursive', escala: 1.3 }
+  ];
+  var INTERLINEAS = [
+    { id: 'junto', nombre: 'Junto', valor: 1.45 },
+    { id: 'normal', nombre: 'Normal', valor: 1.75 },
+    { id: 'amplio', nombre: 'Amplio', valor: 2.1 }
+  ];
+  var TINTAS = [
+    { id: 'carbon', nombre: 'Carbón' },
+    { id: 'azul', nombre: 'Azul' },
+    { id: 'sepia', nombre: 'Sepia' },
+    { id: 'verde', nombre: 'Verde' },
+    { id: 'burdeos', nombre: 'Burdeos' }
+  ];
+  var PAPELES = [
+    { id: 'auto', nombre: 'Auto' },
+    { id: 'claro', nombre: 'Claro' },
+    { id: 'sepia', nombre: 'Sepia' },
+    { id: 'oscuro', nombre: 'Oscuro' }
+  ];
+  var TAPAS = [
+    { id: 'salvia', nombre: 'Salvia', color: '#8b9787' },
+    { id: 'pizarra', nombre: 'Pizarra', color: '#6e7f90' },
+    { id: 'arcilla', nombre: 'Arcilla', color: '#b0846f' },
+    { id: 'rosa', nombre: 'Rosa', color: '#c29a9b' },
+    { id: 'grafito', nombre: 'Grafito', color: '#5d5b57' }
+  ];
+  var AJUSTES_INICIALES = { letra: 'literata', tam: 18, interlinea: 'normal', tinta: 'carbon', papel: 'auto', tapa: 'salvia' };
+
+  function buscar(lista, id) {
+    for (var i = 0; i < lista.length; i++) if (lista[i].id === id) return lista[i];
+    return lista[0];
+  }
+
+  var ajustes = {};
+  Object.keys(AJUSTES_INICIALES).forEach(function (k) {
+    ajustes[k] = datos.ajustes && datos.ajustes[k] !== undefined ? datos.ajustes[k] : AJUSTES_INICIALES[k];
+  });
+  datos.ajustes = ajustes;
+
+  var raiz = document.documentElement;
+  var modoOscuro = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+
+  function aplicarAjustes() {
+    var letra = buscar(LETRAS, ajustes.letra);
+    raiz.style.setProperty('--letra-texto', letra.css);
+    raiz.style.setProperty('--escala-letra', String(letra.escala));
+    raiz.style.setProperty('--tam', ajustes.tam + 'px');
+    raiz.style.setProperty('--interlinea', String(buscar(INTERLINEAS, ajustes.interlinea).valor));
+    raiz.style.setProperty('--tinta-texto', 'var(--tinta-' + buscar(TINTAS, ajustes.tinta).id + ')');
+    raiz.style.setProperty('--tapa', buscar(TAPAS, ajustes.tapa).color);
+    if (ajustes.papel === 'auto') raiz.removeAttribute('data-papel');
+    else raiz.setAttribute('data-papel', ajustes.papel);
+
+    // La barra de estado del móvil toma el color del fondo.
+    if (window.AndroidDiario && window.AndroidDiario.colorBarras) {
+      var oscuro = ajustes.papel === 'oscuro' || (ajustes.papel === 'auto' && modoOscuro && modoOscuro.matches);
+      window.AndroidDiario.colorBarras(getComputedStyle(raiz).getPropertyValue('--fondo').trim(), oscuro);
+    }
+  }
+  if (modoOscuro && modoOscuro.addEventListener) modoOscuro.addEventListener('change', aplicarAjustes);
+
+  function crearOpciones(contenedor, lista, clave, pintar) {
+    var botones = lista.map(function (op) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.setAttribute('aria-label', op.nombre);
+      pintar(b, op);
+      b.addEventListener('click', function () {
+        ajustes[clave] = op.id;
+        marcar();
+        aplicarAjustes();
+        guardarPronto();
+      });
+      contenedor.appendChild(b);
+      return b;
+    });
+    function marcar() {
+      botones.forEach(function (b, i) { b.setAttribute('aria-pressed', String(lista[i].id === ajustes[clave])); });
+    }
+    marcar();
+  }
+
+  function conNombre(b, op) { b.textContent = op.nombre; }
+
+  crearOpciones(document.getElementById('op-letra'), LETRAS, 'letra', function (b, op) {
+    b.textContent = op.nombre;
+    b.style.fontFamily = op.css;
+    if (op.escala > 1) b.style.fontSize = '17px';
+  });
+  crearOpciones(document.getElementById('op-interlinea'), INTERLINEAS, 'interlinea', conNombre);
+  crearOpciones(document.getElementById('op-tinta'), TINTAS, 'tinta', function (b, op) {
+    b.style.background = 'var(--tinta-' + op.id + ')';
+  });
+  crearOpciones(document.getElementById('op-papel'), PAPELES, 'papel', conNombre);
+  crearOpciones(document.getElementById('op-tapa'), TAPAS, 'tapa', function (b, op) {
+    b.style.background = op.color;
+  });
+
+  var opTam = document.getElementById('op-tam');
+  opTam.value = String(ajustes.tam);
+  opTam.addEventListener('input', function () {
+    ajustes.tam = Number(opTam.value);
+    aplicarAjustes();
+    guardarPronto();
+  });
+
+  var panel = document.getElementById('ajustes');
+  var velo = document.getElementById('velo');
+  function panelAbierto() { return panel.classList.contains('abierto'); }
+  function abrirAjustes() {
+    soltarFoco();
+    panel.classList.add('abierto');
+    velo.classList.add('abierto');
+  }
+  function cerrarAjustes() {
+    panel.classList.remove('abierto');
+    velo.classList.remove('abierto');
+    guardar();
+  }
+  document.getElementById('abrir-ajustes').addEventListener('click', function () {
+    if (panelAbierto()) cerrarAjustes(); else abrirAjustes();
+  });
+  document.getElementById('listo').addEventListener('click', cerrarAjustes);
+  velo.addEventListener('click', cerrarAjustes);
+
+  aplicarAjustes();
+
   // ---------- Botones y teclado ----------
   btnSig.addEventListener('click', function () { pasar(1); });
   btnAnt.addEventListener('click', function () { pasar(-1); });
@@ -303,6 +436,7 @@
   btnUltima.addEventListener('click', function () { saltar(total() - 1); });
 
   document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && panelAbierto()) { cerrarAjustes(); return; }
     if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
     if (e.key === 'ArrowRight') pasar(1);
     if (e.key === 'ArrowLeft') pasar(-1);
@@ -310,6 +444,7 @@
 
   // Botón "atrás" de Android: retrocede una hoja; en la portada deja cerrar la app.
   window.atras = function () {
+    if (panelAbierto()) { cerrarAjustes(); return true; }
     if (animando) return true;
     if (actual === 0) { guardar(); return false; }
     pasar(-1);

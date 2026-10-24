@@ -7,7 +7,9 @@ una hoja.
 
 - Cada página guarda la fecha en que se empezó.
 - Al pasar desde la última página con algo escrito se añade una hoja nueva.
-- Lo escrito se guarda solo en el móvil, sin conexión ni cuentas.
+- El botón **Aa** abre los ajustes: tipo de letra (Literata, Clásica, Moderna o Manuscrita),
+  tamaño, interlineado, color de la letra, papel (automático, claro, sepia u oscuro) y color de la tapa.
+- Lo escrito y los ajustes se guardan solo en el móvil, sin conexión ni cuentas.
 
 ## Conseguir la APK
 
@@ -33,5 +35,5 @@ app/src/main/java/...      MainActivity: WebView a pantalla completa + guardado 
 diario.keystore            clave de firma fija, para actualizar sin perder lo escrito
 ```
 
-La tipografía [Literata](https://fonts.google.com/specimen/Literata) (licencia SIL Open Font) va
-incluida en `assets/fuentes/` para que la app funcione sin conexión.
+Las tipografías [Literata](https://fonts.google.com/specimen/Literata) y
+[Caveat](https://fonts.google.com/specimen/Caveat) (licencia SIL Open Font) van incluidas en `assets/fuentes/` para que la app funcione sin conexión.
