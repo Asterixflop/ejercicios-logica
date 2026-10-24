@@ -1,0 +1,42 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.diario.libro'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.diario.libro'
+        minSdk 26
+        targetSdk 35
+        versionCode 1
+        versionName '1.0'
+    }
+
+    // Clave fija incluida en el repositorio para que cada APK nueva se instale encima de la
+    // anterior sin perder lo escrito. Solo sirve para uso personal, no para publicar en Google Play.
+    signingConfigs {
+        diario {
+            storeFile file('../diario.keystore')
+            storePassword 'diario123'
+            keyAlias 'diario'
+            keyPassword 'diario123'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.diario
+        }
+        debug {
+            signingConfig signingConfigs.diario
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}

@@ -1,0 +1,454 @@
+/* Estilo e-reader: una hoja limpia sobre fondo suave, tinta gris carbón y tipografía de lectura.
+   Sigue el tema del móvil (claro u oscuro). */
+
+@font-face {
+  font-family: "Literata";
+  font-style: normal;
+  font-weight: 300 600;
+  font-display: swap;
+  src: url("fuentes/literata.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Literata";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fuentes/literata-italica.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Caveat";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("fuentes/caveat.woff2") format("woff2");
+}
+
+/* Papel "claro" (y "automático" con el móvil en modo claro). Las tintas tienen un tono por papel
+   para que cualquier color de letra se lea bien. Tipo de letra, tamaño, interlineado, tinta y tapa
+   los elige el usuario en el panel de ajustes (app.js los pone como variables en <html>). */
+:root {
+  --fondo: #e8e6e0;
+  --papel: #f8f6f1;
+  --papel-reverso: #efece5;
+  --tinta: #34322e;
+  --tenue: #969187;
+  --linea: #e2ded4;
+  --tapa-texto: #f6f4ee;
+  --tapa-velo: 0;
+  --sombra-hoja: rgba(60, 52, 40, .14);
+  --letra: "Literata", Georgia, "Times New Roman", serif;
+  --tinta-carbon: #34322e;
+  --tinta-azul: #2f4b7c;
+  --tinta-sepia: #6e4b2e;
+  --tinta-verde: #3c5e46;
+  --tinta-burdeos: #7d2f3c;
+  --letra-texto: var(--letra);
+  --escala-letra: 1;
+  --tam: 18px;
+  --interlinea: 1.75;
+  --tinta-texto: var(--tinta-carbon);
+  --tapa: #8b9787;
+}
+
+:root[data-papel="sepia"] {
+  --fondo: #e2d8c4;
+  --papel: #f4ecd9;
+  --papel-reverso: #ebe1cb;
+  --tinta: #3d3326;
+  --tenue: #9a8a70;
+  --linea: #e2d5bb;
+  --sombra-hoja: rgba(80, 60, 30, .16);
+  --tinta-carbon: #3d3326;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fondo: #121211;
+    --papel: #1e1d1b;
+    --papel-reverso: #191816;
+    --tinta: #d9d5cc;
+    --tenue: #7c776e;
+    --linea: #2e2c29;
+    --tapa-texto: #d9d5cc;
+    --tapa-velo: .45;
+    --sombra-hoja: rgba(0, 0, 0, .5);
+    --tinta-carbon: #d9d5cc;
+    --tinta-azul: #9fb5dd;
+    --tinta-sepia: #d3b590;
+    --tinta-verde: #a0c2a8;
+    --tinta-burdeos: #dc9ea8;
+    color-scheme: dark;
+  }
+}
+
+:root[data-papel="oscuro"] {
+  --fondo: #121211;
+  --papel: #1e1d1b;
+  --papel-reverso: #191816;
+  --tinta: #d9d5cc;
+  --tenue: #7c776e;
+  --linea: #2e2c29;
+  --tapa-texto: #d9d5cc;
+  --tapa-velo: .45;
+  --sombra-hoja: rgba(0, 0, 0, .5);
+  --tinta-carbon: #d9d5cc;
+  --tinta-azul: #9fb5dd;
+  --tinta-sepia: #d3b590;
+  --tinta-verde: #a0c2a8;
+  --tinta-burdeos: #dc9ea8;
+  color-scheme: dark;
+}
+
+/* Elegir "claro" o "sepia" con el móvil en modo oscuro: vuelven las tintas de papel claro */
+:root[data-papel="claro"], :root[data-papel="sepia"] {
+  --tapa-texto: #f6f4ee;
+  --tapa-velo: 0;
+  --tinta-azul: #2f4b7c;
+  --tinta-sepia: #6e4b2e;
+  --tinta-verde: #3c5e46;
+  --tinta-burdeos: #7d2f3c;
+  color-scheme: light;
+}
+
+:root[data-papel="claro"] {
+  --fondo: #e8e6e0;
+  --papel: #f8f6f1;
+  --papel-reverso: #efece5;
+  --tinta: #34322e;
+  --tenue: #969187;
+  --linea: #e2ded4;
+  --sombra-hoja: rgba(60, 52, 40, .14);
+  --tinta-carbon: #34322e;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--fondo);
+  font-family: var(--letra);
+  color: var(--tinta);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body { display: flex; flex-direction: column; }
+
+#escena {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  justify-content: center;
+  padding: 20px 18px 6px;
+}
+
+#libro {
+  position: relative;
+  width: 100%;
+  max-width: 540px;
+  height: 100%;
+  perspective: 2400px;
+  touch-action: pan-y;
+}
+
+/* Canto de las hojas de debajo: apenas un par de líneas a la derecha */
+#libro::after {
+  content: "";
+  position: absolute;
+  inset: 2px -3px -3px 2px;
+  z-index: -1;
+  border-radius: 3px 8px 8px 3px;
+  background: var(--papel-reverso);
+  box-shadow: 0 6px 22px var(--sombra-hoja);
+}
+
+.hoja {
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  will-change: transform;
+  --sombra: 0;
+}
+
+.cara {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 3px 8px 8px 3px;
+  overflow: hidden;
+  background: var(--papel);
+  /* Pliegue suave junto al lomo */
+  box-shadow: inset 12px 0 16px -14px var(--sombra-hoja);
+}
+
+.cara::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: var(--sombra);
+  background: linear-gradient(to left, rgba(0, 0, 0, .22), rgba(0, 0, 0, .03) 70%, rgba(255, 255, 255, .08));
+}
+
+.reverso {
+  transform: rotateY(180deg);
+  background: var(--papel-reverso);
+  border-radius: 8px 3px 3px 8px;
+  box-shadow: inset -12px 0 16px -14px var(--sombra-hoja);
+}
+
+.reverso::after {
+  background: linear-gradient(to right, rgba(0, 0, 0, .22), rgba(0, 0, 0, .03) 70%, rgba(255, 255, 255, .08));
+}
+
+/* Página del diario */
+.pagina {
+  display: flex;
+  flex-direction: column;
+  padding: 30px 28px 16px;
+}
+
+.fecha {
+  font-size: 13px;
+  letter-spacing: .06em;
+  color: var(--tenue);
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--linea);
+}
+
+.fecha::first-letter { text-transform: uppercase; }
+
+.texto {
+  flex: 1;
+  width: 100%;
+  border: 0;
+  outline: 0;
+  resize: none;
+  padding: 0;
+  margin: 0;
+  font-family: var(--letra-texto);
+  font-weight: 300;
+  font-size: calc(var(--tam) * var(--escala-letra));
+  line-height: var(--interlinea);
+  color: var(--tinta-texto);
+  background: transparent;
+  caret-color: var(--tinta-texto);
+  touch-action: pan-y;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.texto::placeholder { color: var(--tenue); font-style: italic; opacity: .7; }
+
+.pie {
+  text-align: center;
+  font-size: 12px;
+  color: var(--tenue);
+  padding-top: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Portada: tela lisa, título fino y centrado */
+.portada {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  text-align: center;
+  background: var(--tapa);
+  color: var(--tapa-texto);
+  box-shadow: inset 12px 0 16px -12px rgba(0, 0, 0, .25), inset 0 0 0 100vmax rgba(0, 0, 0, var(--tapa-velo));
+}
+
+.titulo {
+  font: 300 40px/1.15 var(--letra);
+  letter-spacing: .02em;
+  margin: 0;
+}
+
+.adorno {
+  width: 36px;
+  height: 1px;
+  background: currentColor;
+  opacity: .6;
+}
+
+.anio {
+  font-size: 13px;
+  letter-spacing: .3em;
+  opacity: .75;
+  font-variant-numeric: tabular-nums;
+}
+
+.pista {
+  position: absolute;
+  bottom: 28px;
+  font-size: 12px;
+  letter-spacing: .08em;
+  opacity: .6;
+}
+
+/* Barra inferior: discreta, como la de un lector de libros */
+#barra {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 2px 18px 10px;
+  color: var(--tenue);
+}
+
+#barra button {
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 20px;
+  background: transparent;
+  color: var(--tinta);
+  font: 300 22px/1 var(--letra);
+  opacity: .55;
+}
+
+#barra button:active { background: var(--linea); }
+
+#barra button:disabled { opacity: .15; }
+
+#barra button:focus-visible { outline: 1px solid var(--tenue); }
+
+#centro {
+  flex: 1;
+  max-width: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+#num { font-size: 12px; letter-spacing: .04em; font-variant-numeric: tabular-nums; }
+
+#progreso {
+  width: 100%;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--linea);
+  overflow: hidden;
+}
+
+#progreso span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--tenue);
+  transition: width .3s;
+}
+
+#barra #abrir-ajustes { font-size: 17px; width: 46px; }
+
+/* Panel de ajustes: hoja que sube desde abajo */
+#velo {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: rgba(0, 0, 0, .18);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s;
+}
+
+#velo.abierto { opacity: 1; pointer-events: auto; }
+
+#ajustes {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 21;
+  max-height: 72%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 20px 22px 18px;
+  background: var(--papel);
+  color: var(--tinta);
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 -8px 30px var(--sombra-hoja);
+  transform: translateY(105%);
+  visibility: hidden;
+  transition: transform .28s ease, visibility 0s .28s;
+}
+
+#ajustes.abierto {
+  transform: none;
+  visibility: visible;
+  transition: transform .28s ease;
+}
+
+#ajustes h2 {
+  margin: 0 0 9px;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--tenue);
+}
+
+.opciones { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.opciones button {
+  flex: 1 1 0;
+  min-width: 64px;
+  height: 40px;
+  padding: 0 6px;
+  white-space: nowrap;
+  border: 1px solid var(--linea);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--tinta);
+  font: 15px var(--letra);
+}
+
+.opciones button[aria-pressed="true"] {
+  border-color: var(--tinta);
+  background: var(--papel-reverso);
+}
+
+.muestras { display: flex; flex-wrap: wrap; gap: 12px; }
+
+.muestras button {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 0;
+  padding: 0;
+  box-shadow: 0 0 0 1px var(--linea);
+}
+
+.muestras button[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--papel), 0 0 0 4px var(--tinta); }
+
+.tamano { display: flex; align-items: center; gap: 12px; }
+
+.tamano span { color: var(--tinta); font-family: var(--letra); }
+.tamano .a-peq { font-size: 13px; }
+.tamano .a-gra { font-size: 22px; }
+
+.tamano input { flex: 1; min-width: 0; accent-color: var(--tinta); }
+
+#ajustes :focus-visible { outline: 2px solid var(--tenue); outline-offset: 2px; }
+
+#listo {
+  align-self: stretch;
+  height: 44px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--tinta);
+  color: var(--papel);
+  font: 15px var(--letra);
+  letter-spacing: .04em;
+}

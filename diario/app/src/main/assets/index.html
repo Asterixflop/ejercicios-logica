@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="color-scheme" content="light dark">
+  <title>Mi Diario</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="escena">
+    <div id="libro"></div>
+  </main>
+  <nav id="barra">
+    <button id="primera" aria-label="Ir a la portada">«</button>
+    <button id="ant" aria-label="Página anterior">‹</button>
+    <div id="centro">
+      <span id="num"></span>
+      <div id="progreso"><span></span></div>
+    </div>
+    <button id="sig" aria-label="Página siguiente">›</button>
+    <button id="ultima" aria-label="Ir a la última página">»</button>
+    <button id="abrir-ajustes" aria-label="Ajustes de letra y color">Aa</button>
+  </nav>
+  <div id="velo"></div>
+  <section id="ajustes" aria-label="Ajustes de lectura">
+    <div><h2>Letra</h2><div class="opciones" id="op-letra"></div></div>
+    <div>
+      <h2>Tamaño</h2>
+      <div class="tamano">
+        <span class="a-peq">A</span>
+        <input type="range" id="op-tam" min="14" max="30" step="1" aria-label="Tamaño de la letra">
+        <span class="a-gra">A</span>
+      </div>
+    </div>
+    <div><h2>Interlineado</h2><div class="opciones" id="op-interlinea"></div></div>
+    <div><h2>Color de la letra</h2><div class="muestras" id="op-tinta"></div></div>
+    <div><h2>Papel</h2><div class="opciones" id="op-papel"></div></div>
+    <div><h2>Tapa</h2><div class="muestras" id="op-tapa"></div></div>
+    <button id="listo">Listo</button>
+  </section>
+  <script src="app.js"></script>
+</body>
+</html>
