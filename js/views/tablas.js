@@ -161,6 +161,7 @@
     exercises: () => Exercises.tablas,
     listLabel: (ex) => (ex.formula ? fmt(ex.formula) : [ex.premises.map(fmt).join(', '), ' ∴ ', fmt(ex.conclusion)].join('')),
     titleOf: (ex, i) => `Tabla de verdad ${i + 1}`,
+    groupOf: (ex) => (ex.formula ? 'Clasificar fórmulas' : 'Validez de razonamientos'),
     render,
     own: true,
     ownAllowsFormula: true,

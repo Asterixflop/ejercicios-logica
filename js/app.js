@@ -33,17 +33,26 @@
   function list(key) {
     const v = Views[key];
     const exs = v.exercises();
+    const groups = new Map();
+    exs.forEach((ex, i) => {
+      const g = v.groupOf ? v.groupOf(ex) : null;
+      if (!groups.has(g)) groups.set(g, []);
+      groups.get(g).push(i);
+    });
     return [
       h('div', { class: 'crumbs' }, h('a', { href: '#/' }, 'Inicio'), ' / ', v.title),
       h('h1', {}, v.title),
       h('p', { class: 'muted', style: 'max-width:75ch' }, v.intro),
       h('section', { class: 'panel' },
-        h('div', { class: 'panel-head' }, 'Ejercicios propuestos'),
-        h('ul', { class: 'ex-list' }, exs.map((ex, i) => h('li', {},
-          h('a', { href: `#/${key}/${i + 1}` },
-            h('span', { class: 'ex-num' }, `${i + 1}.`),
-            h('span', { class: 'ex-text formula' }, v.listLabel(ex)),
-            levelDots(ex.level)))))),
+        h('div', { class: 'panel-head' }, `Ejercicios propuestos (${exs.length})`),
+        [...groups].map(([g, idxs]) => [
+          g ? h('div', { class: 'panel-sub' }, `${g} (${idxs.length})`) : null,
+          h('ul', { class: 'ex-list' }, idxs.map((i) => h('li', {},
+            h('a', { href: `#/${key}/${i + 1}` },
+              h('span', { class: 'ex-num' }, `${i + 1}.`),
+              h('span', { class: 'ex-text formula' }, v.listLabel(exs[i])),
+              levelDots(exs[i].level))))),
+        ])),
       v.own ? ownReasoningForm(key, { allowFormula: !!v.ownAllowsFormula }) : null,
     ];
   }
