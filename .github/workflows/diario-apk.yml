@@ -1,0 +1,48 @@
+name: APK del diario
+
+on:
+  push:
+    paths:
+      - 'diario/**'
+      - '.github/workflows/diario-apk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: diario
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Compilar APK
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+          cp app/build/outputs/apk/release/app-release.apk MiDiario.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MiDiario-apk
+          path: diario/MiDiario.apk
+
+      # Deja la última APK en una release para descargarla directamente desde el móvil.
+      - name: Publicar en la release "diario"
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: diario
+          name: Mi Diario (APK)
+          body: Descarga MiDiario.apk en el móvil Android y ábrela para instalarla.
+          prerelease: true
+          files: diario/MiDiario.apk
