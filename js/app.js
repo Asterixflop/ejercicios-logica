@@ -10,7 +10,7 @@
       h('div', { class: 'hero' },
         h('h1', {}, 'Practica lógica con corrección automática'),
         h('p', {},
-          'Ejercicios de lógica de enunciados como los de la asignatura de Lógica de Ingeniería Informática: ',
+          'Ejercicios de lógica de enunciados: ',
           'formalización, deducción natural, resolución y tablas de verdad. Escribes tu respuesta y se corrige al momento, ',
           'paso a paso. Es libre, gratuito y no necesita registro.')),
       h('h2', { class: 'section-title' }, 'Lógica de enunciados'),
