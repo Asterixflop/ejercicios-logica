@@ -1,7 +1,7 @@
 # Mi Diario (app Android)
 
-Diario con forma de libro: tapa de piel, hojas con renglones para escribir y paso de página
-animado. Desliza el dedo hacia la izquierda para pasar la hoja (sigue al dedo, como un libro real)
+Diario con forma de libro y estilo de lector electrónico: hojas limpias, tinta suave, tipografía
+Literata y paso de página animado. Sigue el modo claro u oscuro del móvil. Desliza el dedo hacia la izquierda para pasar la hoja (sigue al dedo, como un libro real)
 o hacia la derecha para volver; también hay botones abajo y el botón «atrás» de Android retrocede
 una hoja.
 
@@ -32,3 +32,6 @@ app/src/main/assets/       el libro: index.html, style.css, app.js (se puede pro
 app/src/main/java/...      MainActivity: WebView a pantalla completa + guardado en el móvil
 diario.keystore            clave de firma fija, para actualizar sin perder lo escrito
 ```
+
+La tipografía [Literata](https://fonts.google.com/specimen/Literata) (licencia SIL Open Font) va
+incluida en `assets/fuentes/` para que la app funcione sin conexión.

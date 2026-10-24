@@ -43,6 +43,7 @@
   // Hoja 0 = portada; hoja i (i >= 1) = datos.paginas[i - 1].
   var libro = document.getElementById('libro');
   var num = document.getElementById('num');
+  var progreso = document.querySelector('#progreso span');
   var btnPrimera = document.getElementById('primera');
   var btnAnt = document.getElementById('ant');
   var btnSig = document.getElementById('sig');
@@ -76,11 +77,10 @@
     if (i === 0) {
       frente.className = 'cara portada';
       frente.innerHTML =
-        '<div class="marco">' +
-        '<h1 class="titulo">Mi Diario</h1>' +
-        '<div class="adorno">✦ ✦ ✦</div>' +
-        '</div>' +
-        '<div class="pista">Desliza o toca para abrir</div>';
+        '<h1 class="titulo">Mi diario</h1>' +
+        '<div class="adorno"></div>' +
+        '<div class="anio">' + new Date(datos.paginas[0].fecha).getFullYear() + '</div>' +
+        '<div class="pista">Toca o desliza para abrir</div>';
       frente.addEventListener('click', function () {
         if (!arrastre || !arrastre.movido) pasar(1);
       });
@@ -105,7 +105,7 @@
 
       var pie = document.createElement('div');
       pie.className = 'pie';
-      pie.textContent = '— ' + i + ' —';
+      pie.textContent = String(i);
 
       frente.appendChild(fecha);
       frente.appendChild(texto);
@@ -119,7 +119,7 @@
 
   function ponerAngulo(hoja, angulo) {
     hoja.style.transform = 'rotateY(' + angulo + 'deg)';
-    hoja.style.setProperty('--sombra', String(Math.sin(Math.PI * Math.min(1, -angulo / 180)) * 0.9));
+    hoja.style.setProperty('--sombra', String(Math.sin(Math.PI * Math.min(1, -angulo / 180)) * 0.8));
     // Una hoja ya pasada queda fuera del libro: se oculta para que no asome por la izquierda.
     hoja.style.visibility = angulo <= -179.5 ? 'hidden' : 'visible';
   }
@@ -141,7 +141,8 @@
   function dibujar() { mostrar([actual - 1, actual, actual + 1]); }
 
   function actualizarBarra() {
-    num.textContent = actual === 0 ? 'Portada' : 'Página ' + actual + ' de ' + datos.paginas.length;
+    num.textContent = actual === 0 ? 'Portada' : actual + ' de ' + datos.paginas.length;
+    progreso.style.width = (actual === 0 ? 0 : 100 * actual / datos.paginas.length) + '%';
     btnPrimera.disabled = actual === 0;
     btnAnt.disabled = actual === 0;
     btnUltima.disabled = actual === total() - 1;

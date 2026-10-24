@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Tema" parent="android:Theme.Material.NoActionBar">
+    <!-- Tema claro; values-night tiene el oscuro. La WebView usa el que toque para prefers-color-scheme. -->
+    <style name="Tema" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:windowBackground">@color/fondo</item>
         <item name="android:statusBarColor">@color/fondo</item>
-        <item name="android:navigationBarColor">@color/fondo</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
-    <color name="fondo">#2A1D15</color>
-    <color name="piel">#6B3A22</color>
+    <color name="fondo">#E8E6E0</color>
+    <color name="tapa">#8B9787</color>
 </resources>
